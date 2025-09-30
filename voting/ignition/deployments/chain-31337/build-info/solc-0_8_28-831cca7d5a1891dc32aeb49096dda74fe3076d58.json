@@ -1,0 +1,39 @@
+{
+  "_format": "hh3-sol-build-info-1",
+  "id": "solc-0_8_28-831cca7d5a1891dc32aeb49096dda74fe3076d58",
+  "solcVersion": "0.8.28",
+  "solcLongVersion": "0.8.28+commit.7893614a",
+  "userSourceNameMap": {
+    "contracts/Voting.sol": "project/contracts/Voting.sol"
+  },
+  "input": {
+    "language": "Solidity",
+    "settings": {
+      "evmVersion": "cancun",
+      "optimizer": {
+        "enabled": true,
+        "runs": 200
+      },
+      "outputSelection": {
+        "*": {
+          "": [
+            "ast"
+          ],
+          "*": [
+            "abi",
+            "evm.bytecode",
+            "evm.deployedBytecode",
+            "evm.methodIdentifiers",
+            "metadata"
+          ]
+        }
+      },
+      "remappings": []
+    },
+    "sources": {
+      "project/contracts/Voting.sol": {
+        "content": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.20;\n\ncontract Voting {\n    address public owner;\n\n    struct Candidate {\n        uint id;\n        string name;\n        uint voteCount;\n    }\n\n    Candidate[] public candidates;\n    mapping(address => bool) public hasVoted;\n\n    modifier onlyOwner() {\n        require(msg.sender == owner, \"Not owner\");\n        _;\n    }\n\n    constructor() {\n        owner = msg.sender;\n    }\n\n    function addCandidate(string memory _name) public onlyOwner {\n        uint newId = candidates.length;\n        candidates.push(Candidate(newId, _name, 0));\n    }\n\n    function vote(uint candidateId) public {\n        require(!hasVoted[msg.sender], \"Already voted\");\n        require(candidateId < candidates.length, \"Invalid candidate\");\n\n        candidates[candidateId].voteCount++;\n        hasVoted[msg.sender] = true;\n    }\n\n    function getCandidates() public view returns (Candidate[] memory) {\n        return candidates;\n    }\n\n    function getWinner() public view returns (Candidate memory) {\n        uint count = candidates.length;\n        require(count > 0, \"No candidates\");\n\n        uint winnerIndex = 0;\n        uint maxVotes = 0;\n\n        for (uint i = 0; i < count; i++) {\n            uint votes = candidates[i].voteCount;\n            if (votes > maxVotes) {\n                maxVotes = votes;\n                winnerIndex = i;\n            }\n        }\n\n        if (maxVotes == 0) {\n            return Candidate(0, \"No winner\", 0);\n        }\n\n        return candidates[winnerIndex];\n    }\n}\n"
+      }
+    }
+  }
+}

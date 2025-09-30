@@ -39,17 +39,23 @@ contract Voting {
         return candidates;
     }
 
-    function getWinner() public view returns (Candidate memory winner) {
-        require(candidates.length > 0, "No candidates");
+    function getWinner() public view returns (Candidate memory) {
+        uint count = candidates.length;
+        require(count > 0, "No candidates");
 
-        uint maxVotes = 0;
         uint winnerIndex = 0;
+        uint maxVotes = 0;
 
-        for (uint i = 0; i < candidates.length; i++) {
-            if (candidates[i].voteCount > maxVotes) {
-                maxVotes = candidates[i].voteCount;
+        for (uint i = 0; i < count; i++) {
+            uint votes = candidates[i].voteCount;
+            if (votes > maxVotes) {
+                maxVotes = votes;
                 winnerIndex = i;
             }
+        }
+
+        if (maxVotes == 0) {
+            return Candidate(0, "No winner", 0);
         }
 
         return candidates[winnerIndex];
